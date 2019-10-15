@@ -1,4 +1,4 @@
-import { GeoJson } from "../../types";
+import { GeoJson } from "../types";
 import { polygon as turfPolygon } from "@turf/helpers";
 
 export const getCoordinatesFromGeoJson = (

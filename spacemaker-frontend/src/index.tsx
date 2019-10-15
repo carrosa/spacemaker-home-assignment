@@ -2,11 +2,14 @@ import React from "react";
 import { render } from "react-dom";
 import Map from "./components/Map";
 import * as serviceWorker from "./serviceWorker";
+import MapProvider from "./store/MapProvider";
 
 function App() {
   return (
     <div>
-      <Map />
+      <MapProvider>
+        <Map />
+      </MapProvider>
     </div>
   );
 }

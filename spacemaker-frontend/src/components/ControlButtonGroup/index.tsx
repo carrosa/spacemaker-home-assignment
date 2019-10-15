@@ -1,26 +1,20 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   createGeoJsonObject,
   getCoordinatesFromGeoJson
-} from "../../utils/controls";
+} from "../../utils/polygon-creation";
 import { intersect as turfIntersection, union as turfUnion } from "@turf/turf";
 import { GeoJson } from "../../types";
+import { MapContext } from "../../store/MapProvider";
 
-type Props = {
-  selectedPolygons: number[];
-  toggleCanSetDataPoints(): void;
-  createPolygon(): void;
-  geoJson: GeoJson[];
-  postDeleteAndNew(geoJson: GeoJson): void;
-};
-
-const ControlButtonGroup = ({
-  selectedPolygons,
-  toggleCanSetDataPoints,
-  createPolygon,
-  geoJson,
-  postDeleteAndNew
-}: Props) => {
+const ControlButtonGroup = () => {
+  const {
+    selectedPolygons,
+    geoJson,
+    postDeleteAndNew,
+    postNewPolygon,
+    toggleCanSetDataPoints
+  } = useContext(MapContext);
   const intersect = (): void => {
     const coordinates = getCoordinatesFromGeoJson(selectedPolygons, geoJson);
     if (!coordinates) return;
@@ -50,7 +44,7 @@ const ControlButtonGroup = ({
       <button onClick={intersect}>Intersect</button>
       <button onClick={union}>Union</button>
       <button onClick={toggleCanSetDataPoints}>Set Data Points</button>
-      <button onClick={createPolygon}>Create Polygon</button>
+      <button onClick={postNewPolygon}>Create Polygon</button>
     </div>
   );
 };
