@@ -1,0 +1,58 @@
+version: "3.3"
+
+services:  
+  postgres:
+    container_name: spacemakerdb
+    build:
+      context: ./spacemaker-backend
+      dockerfile: postgres/Dockerfile
+    restart: always
+    volumes: 
+      - "db-data:/var/lib/postgresql/data"
+      - "./spacemaker-backend/postgres/sql:/postgres/sql"
+    ports:
+      - "5432:5432"
+    networks: 
+      - db
+    environment: 
+      POSTGRES_DB: spacemakerdb
+
+  spacemaker-api:
+    build:
+      context: ./spacemaker-backend
+      dockerfile: Dockerfile.prod
+    restart: always
+    container_name: spacemaker-api
+    working_dir: /home/hilfling-oauth
+    environment: 
+      GIN_MODE: "release"
+    networks:
+      - db
+      - web
+    ports: 
+      - "8080:8080"
+    depends_on: 
+      - postgres
+
+  spacemaker-frontend:
+    environment:
+      - PUID=1000
+      - PGID=1000
+    container_name: spacermaker-frontend
+    build:
+      context: ./spacemaker-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - web
+
+
+volumes: 
+  db-data:
+
+networks: 
+  db:
+    driver: bridge
+  web:
+    driver: bridge
