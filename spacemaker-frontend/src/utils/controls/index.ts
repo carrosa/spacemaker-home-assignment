@@ -60,5 +60,3 @@ export const getDataPointPosition = (
   //setSelectedDataPoints([...selectedDataPoints, latlng]);
   return [...selectedDataPoints, latlng];
 };
-
-

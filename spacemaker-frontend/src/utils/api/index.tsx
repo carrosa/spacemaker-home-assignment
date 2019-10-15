@@ -13,7 +13,7 @@ const api = axios.create({
   headers: HEADERS
 });
 
-export const postGeoJson = (geojson: GeoJson) => {
+export const addGeoJson = (geojson: GeoJson) => {
   return api
     .post("/geojson", {
       type: geojson.geojson.type,
@@ -31,10 +31,11 @@ export const postGeoJson = (geojson: GeoJson) => {
 };
 
 export const deleteGeoJson = (id: number) => {
+  //
   return api.post(`/geojson/${id}/`).then(res => Number(res.data.id));
 };
 
-export const getGeoJson = () => {
+export const getAllGeoJson = () => {
   return api.get("/geojson").then(res =>
     res.data.map((d: any) => {
       return {

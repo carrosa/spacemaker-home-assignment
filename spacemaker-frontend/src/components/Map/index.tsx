@@ -1,20 +1,10 @@
-import React, { SyntheticEvent, useEffect, useState } from "react";
-import { Map as LeafletMap, TileLayer, GeoJSON, Polygon } from "react-leaflet";
-import {
-  polygon as turfPolygon,
-  intersect as turfIntersection,
-  union as turfUnion
-} from "@turf/turf";
+import React, { useEffect, useState } from "react";
+import { Map as LeafletMap, TileLayer, Polygon } from "react-leaflet";
 import { GeoJson } from "../../types";
-import { deleteGeoJson, getGeoJson, postGeoJson } from "../../utils/api";
+import { deleteGeoJson, getAllGeoJson, addGeoJson } from "../../utils/api";
 import styles from "./style.module.css";
 import ControlButtonGroup from "../ControlButtonGroup";
-import {
-  createGeoJsonObject,
-  createPolygon,
-  getCoordinatesFromGeoJson,
-  getDataPointPosition
-} from "../../utils/controls";
+import { createPolygon, getDataPointPosition } from "../../utils/controls";
 
 const Map = () => {
   const [geoJson, setGeoJson] = useState<GeoJson[]>([]);
@@ -24,17 +14,17 @@ const Map = () => {
   const [selectedDataPoints, setSelectedDataPoints] = useState<number[][]>([]);
 
   useEffect(() => {
-    getGeoJson().then(setGeoJson);
+    getAllGeoJson().then(setGeoJson);
     /*getGeoJson().then(data => setGeoJson(data.features));*/
   }, []);
 
   useEffect(() => {
-    generatePolygons(selectedPolygons);
+    generatePolygons();
   }, [geoJson]);
 
   useEffect(() => {
     // Set color of selected/unselected polygons
-    generatePolygons(selectedPolygons);
+    generatePolygons();
   }, [selectedPolygons]);
 
   const selectPolygon = (index: number) => {
@@ -49,7 +39,7 @@ const Map = () => {
     }
   };
 
-  const generatePolygons = (selectedPolygons: number[]) => {
+  const generatePolygons = () => {
     setPolygons(
       geoJson.map(gj => {
         return (
@@ -65,7 +55,7 @@ const Map = () => {
   };
 
   const postNew = () => {
-    postGeoJson(createPolygon(selectedDataPoints))
+    addGeoJson(createPolygon(selectedDataPoints))
       .then(data => setGeoJson([...geoJson, data]))
       .then(() => {
         setSelectedDataPoints([]);
@@ -74,7 +64,7 @@ const Map = () => {
   };
 
   const postDeleteAndNew = (newGeoJson: GeoJson) => {
-    postGeoJson(newGeoJson)
+    addGeoJson(newGeoJson)
       .then(data => {
         console.log(data);
         setGeoJson([...geoJson, data]);
@@ -91,30 +81,6 @@ const Map = () => {
         ])
       )
       .then(() => setSelectedPolygons([]));
-  };
-
-  const intersect = (): void => {
-    const coordinates = getCoordinatesFromGeoJson(selectedPolygons, geoJson);
-    if (!coordinates) return;
-
-    const intersection = turfIntersection(coordinates[0], coordinates[1]);
-    if (!intersection) return;
-
-    const geoJsonIntersection = createGeoJsonObject(intersection);
-
-    postDeleteAndNew(geoJsonIntersection);
-  };
-
-  const union = (): void => {
-    const coordinates = getCoordinatesFromGeoJson(selectedPolygons, geoJson);
-    if (!coordinates) return;
-
-    const union = turfUnion(coordinates[0], coordinates[1]);
-    if (!union) return;
-
-    const geoJsonUnion = createGeoJsonObject(union);
-    // Set new polygons (geoJson)
-    postDeleteAndNew(geoJsonUnion);
   };
 
   const toggleCanSetDataPoints = () => {
@@ -146,9 +112,10 @@ const Map = () => {
         {polygons}
       </LeafletMap>
       <ControlButtonGroup
-        intersect={intersect}
-        union={union}
-        setCanSetDataPoints={toggleCanSetDataPoints}
+        postDeleteAndNew={postDeleteAndNew}
+        geoJson={geoJson}
+        selectedPolygons={selectedPolygons}
+        toggleCanSetDataPoints={toggleCanSetDataPoints}
         createPolygon={postNew}
       />
     </div>
