@@ -23,7 +23,6 @@ services:
       dockerfile: Dockerfile.prod
     restart: always
     container_name: spacemaker-api
-    working_dir: /home/hilfling-oauth
     environment: 
       GIN_MODE: "release"
     networks:

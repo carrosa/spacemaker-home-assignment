@@ -1,7 +1,10 @@
 spacemaker-hjemmoppgave
 
-To run project:
+For å kjøre prosjektet:
 1. cd spacemaker-backend && ./development
+  * Dette starter development docker-container til postgres og go api
 2. cd spacemaker-frontend && npm start
+  * starter react appen
 
-TODO: create single docker-compose file for entire project
+TODO: Lag en docker-compose fil i top-level
+* Dette er egt gjort, men av en eller annen grunn får appen noen bugs da, så start appen på måten beskrevet ovenfor
