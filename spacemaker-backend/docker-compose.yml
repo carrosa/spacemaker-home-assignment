@@ -1,0 +1,46 @@
+version: "3.7"
+
+services: 
+  postgres:
+    container_name: spacemakerdb
+    build:
+      context: .
+      dockerfile: postgres/Dockerfile
+    restart: always
+    networks: 
+      - db
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+      - "./postgres/sql:/postgres/sql"
+    ports:
+      - "5432:5432"
+
+  spacemaker-api:
+    container_name: spacemaker-api
+    restart: unless-stopped
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      DEBUG: "true"
+      SERVING_PORT: ":8080"
+    networks: 
+      - db
+    volumes: 
+      - .:/home/spacemaker-api
+    working_dir: /home/spacemaker-api/src
+    ports: 
+      - "8080:8080"
+    command: bash -c "go mod download && make serve"
+    depends_on:
+      - postgres
+
+networks:
+  db:
+    driver: bridge
+
+volumes:
+  db-data:
+
+  
